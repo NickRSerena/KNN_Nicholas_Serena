@@ -1,0 +1,119 @@
+import numpy as np
+import random as r
+import shapes
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split 
+from collections import Counter
+
+
+def cosine(v1, v2):
+    dot = np.dot(v1, v2)
+    mag1 = np.linalg.norm(v1)
+    mag2 = np.linalg.norm(v2)
+    return dot / (mag1 * mag2)
+
+def euclidean(v1, v2):
+    sum = np.sum(np.square(v1 - v2))
+
+    dist = np.sqrt(sum)
+
+    return dist
+
+def similarity(vec, V, y):
+    dict = {}
+    
+    for i, v in enumerate(V):
+        dict[i] = (cosine(vec, v),y[i])
+            
+    return dict
+
+def label(x):
+    if isinstance(x, list):
+        s = ["ellipse", "rectangle", "triangle"]
+        neighbours = [s[int(x[i])] for i in range(len(x))]
+        return neighbours
+    if isinstance(int(x), int):
+        s = ["ellipse", "rectangle", "triangle"]
+        return s[int(x)]
+    
+    
+def get_pred(l):
+    dict = Counter(l)
+
+    tag = dict.most_common(1)[0][0]
+    return tag
+    
+
+
+    
+
+
+
+
+data = shapes.shapes()
+
+x_data, y_data = data.load_xy()
+
+x_train, x_test, y_train, y_test = train_test_split(x_data.T, y_data.T, test_size=0.2, random_state=42)
+
+space_x = []
+for x in x_train:
+    space_x.append(x)
+
+space_y = []
+for y in y_train:
+    space_y.append(y)
+
+
+
+
+
+vector_x = []
+for x in x_test:    
+    vector_x.append(x)
+
+vector_y = []
+for y in y_test:
+    vector_y.append(y)
+
+
+for i in range(10):
+    vector = vector_x[i]
+    vecy = vector_y[i]
+    similarity_dict = similarity(vector, space_x, space_y)
+    similarity_dict = sorted(similarity_dict.items(), key=lambda x: x[1][0], reverse=True)
+
+
+    k = 7
+    neighbours = label([int(similarity_dict[j][1][1].squeeze()) for j in range(k)])
+    
+
+
+
+    print(neighbours)
+
+    pred = get_pred(neighbours)
+
+    print("Pred ",pred)
+
+    print("True ", label(vecy))
+    print()
+
+
+
+   
+
+
+
+
+
+# for i, v in enumerate(space):
+#     x,y = v[0], v[1]
+#     plt.plot(x,y, 'o')
+#     plt.text(x,y, i, fontsize = 7)
+    
+
+# plt.plot(vector[0], vector[1], 'x')
+
+
+# plt.show()
